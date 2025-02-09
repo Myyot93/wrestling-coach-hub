@@ -79,6 +79,38 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          full_name: string | null
+          id: string
+          role: string
+          team_id: number | null
+          updated_at: string
+        }
+        Insert: {
+          full_name?: string | null
+          id: string
+          role?: string
+          team_id?: number | null
+          updated_at?: string
+        }
+        Update: {
+          full_name?: string | null
+          id?: string
+          role?: string
+          team_id?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       schedule: {
         Row: {
           location: string | null
