@@ -9,7 +9,235 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      coach: {
+        Row: {
+          coach_id: number
+          email_address: string | null
+          first_name: string | null
+          last_name: string | null
+          phone_number: string | null
+        }
+        Insert: {
+          coach_id?: number
+          email_address?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          phone_number?: string | null
+        }
+        Update: {
+          coach_id?: number
+          email_address?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          phone_number?: string | null
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          away_team_id: number | null
+          home_team_id: number | null
+          id: number
+          match_date: string | null
+          winner_team_id: number | null
+        }
+        Insert: {
+          away_team_id?: number | null
+          home_team_id?: number | null
+          id?: number
+          match_date?: string | null
+          winner_team_id?: number | null
+        }
+        Update: {
+          away_team_id?: number | null
+          home_team_id?: number | null
+          id?: number
+          match_date?: string | null
+          winner_team_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_away_team_id_fkey"
+            columns: ["away_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_home_team_id_fkey"
+            columns: ["home_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_winner_team_id_fkey"
+            columns: ["winner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedule: {
+        Row: {
+          location: string | null
+          match_date: string
+          match_id: number
+          match_time: string
+          schedule_id: number
+        }
+        Insert: {
+          location?: string | null
+          match_date: string
+          match_id: number
+          match_time: string
+          schedule_id?: number
+        }
+        Update: {
+          location?: string | null
+          match_date?: string
+          match_id?: number
+          match_time?: string
+          schedule_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scores: {
+        Row: {
+          id: number
+          match_id: number | null
+          score: number
+          team_id: number | null
+        }
+        Insert: {
+          id?: number
+          match_id?: number | null
+          score: number
+          team_id?: number | null
+        }
+        Update: {
+          id?: number
+          match_id?: number | null
+          score?: number
+          team_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scores_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scores_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      standings: {
+        Row: {
+          draws: number | null
+          losses: number | null
+          points: number | null
+          standing_id: number
+          team_id: number
+          updated_at: string | null
+          wins: number | null
+        }
+        Insert: {
+          draws?: number | null
+          losses?: number | null
+          points?: number | null
+          standing_id?: number
+          team_id: number
+          updated_at?: string | null
+          wins?: number | null
+        }
+        Update: {
+          draws?: number | null
+          losses?: number | null
+          points?: number | null
+          standing_id?: number
+          team_id?: number
+          updated_at?: string | null
+          wins?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standings_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          coach: string
+          id: number
+          name: string
+        }
+        Insert: {
+          coach: string
+          id?: number
+          name: string
+        }
+        Update: {
+          coach?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          created_at: string | null
+          password_hash: string
+          role: string
+          team_id: number | null
+          user_id: number
+          username: string
+        }
+        Insert: {
+          created_at?: string | null
+          password_hash: string
+          role: string
+          team_id?: number | null
+          user_id?: number
+          username: string
+        }
+        Update: {
+          created_at?: string | null
+          password_hash?: string
+          role?: string
+          team_id?: number | null
+          user_id?: number
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
