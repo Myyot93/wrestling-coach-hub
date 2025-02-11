@@ -3,9 +3,28 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user?.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   return (
     <nav className="bg-wrestling-dark text-wrestling-light py-4 fixed w-full top-0 z-50">
@@ -20,6 +39,11 @@ const Navbar = () => {
             <Link to="/" className="hover:text-wrestling-accent transition-colors">
               Home
             </Link>
+            {profile?.role === 'admin' && (
+              <Link to="/admin" className="hover:text-wrestling-accent transition-colors">
+                Admin Dashboard
+              </Link>
+            )}
             <Link to="/login" className="hover:text-wrestling-accent transition-colors">
               Coach Login
             </Link>
@@ -51,6 +75,15 @@ const Navbar = () => {
               >
                 Home
               </Link>
+              {profile?.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  className="text-wrestling-light hover:text-wrestling-accent transition-colors py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
+              )}
               <Link
                 to="/login"
                 className="text-wrestling-light hover:text-wrestling-accent transition-colors py-2"

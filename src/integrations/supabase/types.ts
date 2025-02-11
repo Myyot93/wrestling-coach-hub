@@ -39,9 +39,12 @@ export type Database = {
           home_team_id: number | null
           id: number
           match_date: string | null
+          match_time: string | null
           notes: string | null
+          season: string | null
           status: Database["public"]["Enums"]["match_status"] | null
           venue: string | null
+          weight_class: string | null
           winner_team_id: number | null
         }
         Insert: {
@@ -49,9 +52,12 @@ export type Database = {
           home_team_id?: number | null
           id?: number
           match_date?: string | null
+          match_time?: string | null
           notes?: string | null
+          season?: string | null
           status?: Database["public"]["Enums"]["match_status"] | null
           venue?: string | null
+          weight_class?: string | null
           winner_team_id?: number | null
         }
         Update: {
@@ -59,9 +65,12 @@ export type Database = {
           home_team_id?: number | null
           id?: number
           match_date?: string | null
+          match_time?: string | null
           notes?: string | null
+          season?: string | null
           status?: Database["public"]["Enums"]["match_status"] | null
           venue?: string | null
+          weight_class?: string | null
           winner_team_id?: number | null
         }
         Relationships: [
