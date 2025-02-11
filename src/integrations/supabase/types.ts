@@ -39,6 +39,9 @@ export type Database = {
           home_team_id: number | null
           id: number
           match_date: string | null
+          notes: string | null
+          status: Database["public"]["Enums"]["match_status"] | null
+          venue: string | null
           winner_team_id: number | null
         }
         Insert: {
@@ -46,6 +49,9 @@ export type Database = {
           home_team_id?: number | null
           id?: number
           match_date?: string | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["match_status"] | null
+          venue?: string | null
           winner_team_id?: number | null
         }
         Update: {
@@ -53,6 +59,9 @@ export type Database = {
           home_team_id?: number | null
           id?: number
           match_date?: string | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["match_status"] | null
+          venue?: string | null
           winner_team_id?: number | null
         }
         Relationships: [
@@ -278,7 +287,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      match_status: "scheduled" | "in_progress" | "completed" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never

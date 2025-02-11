@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -95,6 +96,21 @@ const Index = () => {
     },
   });
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'scheduled':
+        return 'bg-blue-500';
+      case 'in_progress':
+        return 'bg-yellow-500';
+      case 'completed':
+        return 'bg-green-500';
+      case 'cancelled':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-wrestling-dark">
       <Navbar />
@@ -130,7 +146,10 @@ const Index = () => {
                 <TableHead>Date</TableHead>
                 <TableHead>Home Team</TableHead>
                 <TableHead>Away Team</TableHead>
+                <TableHead>Venue</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Winner</TableHead>
+                <TableHead>Notes</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -141,7 +160,18 @@ const Index = () => {
                   </TableCell>
                   <TableCell>{match.home_team?.name}</TableCell>
                   <TableCell>{match.away_team?.name}</TableCell>
+                  <TableCell>{match.venue || 'TBD'}</TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(match.status)}>
+                      {match.status?.replace('_', ' ')}
+                    </Badge>
+                  </TableCell>
                   <TableCell>{match.winner?.name || 'TBD'}</TableCell>
+                  <TableCell>
+                    {match.notes && (
+                      <span className="text-sm text-gray-600">{match.notes}</span>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
