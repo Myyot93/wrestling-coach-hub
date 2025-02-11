@@ -1,104 +1,186 @@
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Award, Calendar, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import Navbar from "@/components/Navbar";
-import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
-  const features = [
-    {
-      icon: <Calendar className="h-12 w-12 text-wrestling-accent" />,
-      title: "Match Scheduling",
-      description: "Easy access to upcoming matches and tournament schedules",
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  // Fetch profile data including team_id and role
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user?.id)
+        .single();
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error fetching profile",
+          description: error.message,
+        });
+        return null;
+      }
+      return data;
     },
-    {
-      icon: <Users className="h-12 w-12 text-wrestling-accent" />,
-      title: "Team Management",
-      description: "Comprehensive tools for managing your wrestling team",
+    enabled: !!user,
+  });
+
+  // Fetch team's matches
+  const { data: matches } = useQuery({
+    queryKey: ["matches", profile?.team_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("matches")
+        .select(`
+          *,
+          home_team:teams!matches_home_team_id_fkey(name),
+          away_team:teams!matches_away_team_id_fkey(name),
+          winner:teams!matches_winner_team_id_fkey(name)
+        `)
+        .or(`home_team_id.eq.${profile?.team_id},away_team_id.eq.${profile?.team_id}`)
+        .order('match_date', { ascending: true });
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error fetching matches",
+          description: error.message,
+        });
+        return [];
+      }
+      return data;
     },
-    {
-      icon: <Award className="h-12 w-12 text-wrestling-accent" />,
-      title: "Statistics Tracking",
-      description: "Detailed statistics and performance analytics",
+    enabled: !!profile?.team_id,
+  });
+
+  // Fetch standings
+  const { data: standings } = useQuery({
+    queryKey: ["standings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("standings")
+        .select(`
+          *,
+          team:teams(name)
+        `)
+        .order('points', { ascending: false });
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error fetching standings",
+          description: error.message,
+        });
+        return [];
+      }
+      return data;
     },
-  ];
+  });
 
   return (
     <div className="min-h-screen bg-wrestling-dark">
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto text-center">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl md:text-6xl font-bold text-wrestling-light mb-6"
-          >
-            Coal Region Wrestling
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-wrestling-muted text-lg md:text-xl mb-8 max-w-2xl mx-auto"
-          >
-            The premier platform for high school wrestling coaches to manage teams, track statistics, and coordinate matches across the Coal Region.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <Link to="/login">
-              <Button className="bg-wrestling-accent text-wrestling-dark hover:bg-wrestling-dark hover:text-wrestling-accent border-2 border-wrestling-accent transition-all px-8 py-6 text-lg">
-                Coach Login
-                <ArrowRight className="ml-2" />
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-wrestling-light">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-wrestling-dark text-center mb-12">
-            Platform Features
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.2 }}
-                className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
-              >
-                <div className="mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold text-wrestling-dark mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-wrestling-muted">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-wrestling-dark text-wrestling-light py-8">
-        <div className="container mx-auto px-4 text-center">
+      <div className="container mx-auto pt-32 pb-20 px-4">
+        {/* Welcome Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-12"
+        >
+          <h1 className="text-4xl font-bold text-wrestling-light mb-4">
+            Welcome, {profile?.full_name || 'Coach'}
+          </h1>
           <p className="text-wrestling-muted">
-            © {new Date().getFullYear()} Coal Region Wrestling. All rights reserved.
+            Manage your team's matches and view standings
           </p>
-        </div>
-      </footer>
+        </motion.div>
+
+        {/* Team Matches */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-white rounded-lg shadow-lg p-6 mb-8"
+        >
+          <h2 className="text-2xl font-semibold mb-4">Your Team's Matches</h2>
+          <Table>
+            <TableCaption>A list of your team's matches</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Home Team</TableHead>
+                <TableHead>Away Team</TableHead>
+                <TableHead>Winner</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {matches?.map((match) => (
+                <TableRow key={match.id}>
+                  <TableCell>
+                    {new Date(match.match_date).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>{match.home_team?.name}</TableCell>
+                  <TableCell>{match.away_team?.name}</TableCell>
+                  <TableCell>{match.winner?.name || 'TBD'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </motion.div>
+
+        {/* League Standings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="bg-white rounded-lg shadow-lg p-6"
+        >
+          <h2 className="text-2xl font-semibold mb-4">League Standings</h2>
+          <Table>
+            <TableCaption>Current league standings</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Team</TableHead>
+                <TableHead>Wins</TableHead>
+                <TableHead>Losses</TableHead>
+                <TableHead>Draws</TableHead>
+                <TableHead>Points</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {standings?.map((standing) => (
+                <TableRow key={standing.standing_id}>
+                  <TableCell>{standing.team?.name}</TableCell>
+                  <TableCell>{standing.wins}</TableCell>
+                  <TableCell>{standing.losses}</TableCell>
+                  <TableCell>{standing.draws}</TableCell>
+                  <TableCell>{standing.points}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </motion.div>
+      </div>
     </div>
   );
 };
