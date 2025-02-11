@@ -2,6 +2,8 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();

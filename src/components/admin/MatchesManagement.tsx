@@ -23,6 +23,8 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import MatchStatusBadge from "../matches/MatchStatusBadge";
 
+type MatchStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
+
 const MatchesManagement = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -63,7 +65,7 @@ const MatchesManagement = () => {
 
   // Update match status mutation
   const updateMatchStatus = useMutation({
-    mutationFn: async ({ matchId, status }: { matchId: number, status: string }) => {
+    mutationFn: async ({ matchId, status }: { matchId: number, status: MatchStatus }) => {
       const { error } = await supabase
         .from('matches')
         .update({ status })
@@ -87,7 +89,7 @@ const MatchesManagement = () => {
     },
   });
 
-  const handleStatusChange = (matchId: number, status: string) => {
+  const handleStatusChange = (matchId: number, status: MatchStatus) => {
     updateMatchStatus.mutate({ matchId, status });
   };
 
@@ -125,8 +127,8 @@ const MatchesManagement = () => {
               <TableCell>{match.season || 'Current'}</TableCell>
               <TableCell>
                 <Select
-                  value={match.status}
-                  onValueChange={(value) => handleStatusChange(match.id, value)}
+                  value={match.status as MatchStatus}
+                  onValueChange={(value) => handleStatusChange(match.id, value as MatchStatus)}
                 >
                   <SelectTrigger className="w-[180px]">
                     <SelectValue>
