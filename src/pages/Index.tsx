@@ -1,21 +1,12 @@
 
-import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import MatchesTable from "@/components/matches/MatchesTable";
+import StandingsTable from "@/components/standings/StandingsTable";
 
 const Index = () => {
   const { user } = useAuth();
@@ -96,21 +87,6 @@ const Index = () => {
     },
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'scheduled':
-        return 'bg-blue-500';
-      case 'in_progress':
-        return 'bg-yellow-500';
-      case 'completed':
-        return 'bg-green-500';
-      case 'cancelled':
-        return 'bg-red-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
-
   return (
     <div className="min-h-screen bg-wrestling-dark">
       <Navbar />
@@ -139,43 +115,11 @@ const Index = () => {
           className="bg-white rounded-lg shadow-lg p-6 mb-8"
         >
           <h2 className="text-2xl font-semibold mb-4">Your Team's Matches</h2>
-          <Table>
-            <TableCaption>A list of your team's matches</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Home Team</TableHead>
-                <TableHead>Away Team</TableHead>
-                <TableHead>Venue</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Winner</TableHead>
-                <TableHead>Notes</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {matches?.map((match) => (
-                <TableRow key={match.id}>
-                  <TableCell>
-                    {new Date(match.match_date).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>{match.home_team?.name}</TableCell>
-                  <TableCell>{match.away_team?.name}</TableCell>
-                  <TableCell>{match.venue || 'TBD'}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(match.status)}>
-                      {match.status?.replace('_', ' ')}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{match.winner?.name || 'TBD'}</TableCell>
-                  <TableCell>
-                    {match.notes && (
-                      <span className="text-sm text-gray-600">{match.notes}</span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <MatchesTable 
+            matches={matches || []} 
+            userTeamId={profile?.team_id} 
+            userRole={profile?.role || 'user'}
+          />
         </motion.div>
 
         {/* League Standings */}
@@ -186,29 +130,7 @@ const Index = () => {
           className="bg-white rounded-lg shadow-lg p-6"
         >
           <h2 className="text-2xl font-semibold mb-4">League Standings</h2>
-          <Table>
-            <TableCaption>Current league standings</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Team</TableHead>
-                <TableHead>Wins</TableHead>
-                <TableHead>Losses</TableHead>
-                <TableHead>Draws</TableHead>
-                <TableHead>Points</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {standings?.map((standing) => (
-                <TableRow key={standing.standing_id}>
-                  <TableCell>{standing.team?.name}</TableCell>
-                  <TableCell>{standing.wins}</TableCell>
-                  <TableCell>{standing.losses}</TableCell>
-                  <TableCell>{standing.draws}</TableCell>
-                  <TableCell>{standing.points}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <StandingsTable standings={standings || []} />
         </motion.div>
       </div>
     </div>
