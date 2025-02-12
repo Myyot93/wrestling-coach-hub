@@ -19,9 +19,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import MatchStatusBadge from "../matches/MatchStatusBadge";
+import CreateMatchModal from "./CreateMatchModal";
 
 type MatchStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
 
@@ -29,6 +29,7 @@ const MatchesManagement = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedMatch, setSelectedMatch] = useState<number | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Fetch matches with related data
   const { data: matches } = useQuery({
@@ -58,6 +59,20 @@ const MatchesManagement = () => {
         .from("teams")
         .select("*")
         .order('name');
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch seasons for the create form
+  const { data: seasons } = useQuery({
+    queryKey: ["seasons"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("seasons")
+        .select("*")
+        .order('start_date', { ascending: false });
 
       if (error) throw error;
       return data;
@@ -98,7 +113,7 @@ const MatchesManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-wrestling-light">Manage Matches</h2>
-        <Button variant="outline">Add New Match</Button>
+        <Button onClick={() => setIsCreateModalOpen(true)}>Add New Match</Button>
       </div>
 
       <Table>
@@ -157,6 +172,15 @@ const MatchesManagement = () => {
           ))}
         </TableBody>
       </Table>
+
+      {teams && seasons && (
+        <CreateMatchModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          teams={teams}
+          seasons={seasons}
+        />
+      )}
     </div>
   );
 };
