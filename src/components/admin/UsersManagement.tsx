@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Table,
@@ -11,8 +12,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import CreateUserModal from "./CreateUserModal";
 
 const UsersManagement = () => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   const { data: users } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
@@ -29,10 +33,24 @@ const UsersManagement = () => {
     },
   });
 
+  const { data: teams } = useQuery({
+    queryKey: ["teams"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("teams")
+        .select("*")
+        .order('name');
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-wrestling-light">Manage Users</h2>
+        <Button onClick={() => setIsCreateModalOpen(true)}>Add New User</Button>
       </div>
 
       <Table>
@@ -58,6 +76,14 @@ const UsersManagement = () => {
           ))}
         </TableBody>
       </Table>
+
+      {teams && (
+        <CreateUserModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          teams={teams}
+        />
+      )}
     </div>
   );
 };
