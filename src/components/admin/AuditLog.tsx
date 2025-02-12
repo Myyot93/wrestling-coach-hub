@@ -20,7 +20,7 @@ const AuditLog = () => {
         .from("audit_logs")
         .select(`
           *,
-          user:user_id(
+          user:profiles(
             id,
             full_name
           )
