@@ -20,7 +20,10 @@ const AuditLog = () => {
         .from("audit_logs")
         .select(`
           *,
-          user:profiles!inner(full_name)
+          user:user_id(
+            id,
+            full_name
+          )
         `)
         .order('created_at', { ascending: false });
 
@@ -51,7 +54,7 @@ const AuditLog = () => {
           {auditLogs?.map((log) => (
             <TableRow key={log.id}>
               <TableCell>{format(new Date(log.created_at), 'MMM d, yyyy HH:mm:ss')}</TableCell>
-              <TableCell>{log.user.full_name}</TableCell>
+              <TableCell>{log.user?.full_name || 'System'}</TableCell>
               <TableCell>{log.action}</TableCell>
               <TableCell>{log.table_name}</TableCell>
               <TableCell>{log.record_id}</TableCell>

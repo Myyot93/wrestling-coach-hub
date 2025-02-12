@@ -40,7 +40,8 @@ const MatchesManagement = () => {
           *,
           home_team:teams!matches_home_team_id_fkey(name),
           away_team:teams!matches_away_team_id_fkey(name),
-          winner:teams!matches_winner_team_id_fkey(name)
+          winner:teams!matches_winner_team_id_fkey(name),
+          season:seasons(name)
         `)
         .order('match_date', { ascending: true });
 
@@ -124,10 +125,10 @@ const MatchesManagement = () => {
               <TableCell>{match.away_team?.name}</TableCell>
               <TableCell>{match.venue || 'TBD'}</TableCell>
               <TableCell>{match.weight_class || 'N/A'}</TableCell>
-              <TableCell>{match.season || 'Current'}</TableCell>
+              <TableCell>{match.season?.name || 'N/A'}</TableCell>
               <TableCell>
                 <Select
-                  value={match.status as MatchStatus}
+                  value={match.status}
                   onValueChange={(value) => handleStatusChange(match.id, value as MatchStatus)}
                 >
                   <SelectTrigger className="w-[180px]">
