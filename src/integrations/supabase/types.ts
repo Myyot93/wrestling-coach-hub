@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          changes: Json | null
+          created_at: string
+          id: number
+          record_id: number | null
+          table_name: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          changes?: Json | null
+          created_at?: string
+          id?: number
+          record_id?: number | null
+          table_name: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          changes?: Json | null
+          created_at?: string
+          id?: number
+          record_id?: number | null
+          table_name?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       coach: {
         Row: {
           coach_id: number
@@ -41,7 +71,7 @@ export type Database = {
           match_date: string | null
           match_time: string | null
           notes: string | null
-          season: string | null
+          season_id: number | null
           status: Database["public"]["Enums"]["match_status"] | null
           venue: string | null
           weight_class: string | null
@@ -54,7 +84,7 @@ export type Database = {
           match_date?: string | null
           match_time?: string | null
           notes?: string | null
-          season?: string | null
+          season_id?: number | null
           status?: Database["public"]["Enums"]["match_status"] | null
           venue?: string | null
           weight_class?: string | null
@@ -67,7 +97,7 @@ export type Database = {
           match_date?: string | null
           match_time?: string | null
           notes?: string | null
-          season?: string | null
+          season_id?: number | null
           status?: Database["public"]["Enums"]["match_status"] | null
           venue?: string | null
           weight_class?: string | null
@@ -86,6 +116,13 @@ export type Database = {
             columns: ["home_team_id"]
             isOneToOne: false
             referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
             referencedColumns: ["id"]
           },
           {
@@ -196,6 +233,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      seasons: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: number
+          is_active: boolean | null
+          name: string
+          start_date: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: number
+          is_active?: boolean | null
+          name: string
+          start_date: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: number
+          is_active?: boolean | null
+          name?: string
+          start_date?: string
+        }
+        Relationships: []
       }
       standings: {
         Row: {

@@ -1,11 +1,13 @@
 
+import { Outlet } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import MatchesManagement from "@/components/admin/MatchesManagement";
+import AdminNav from "@/components/admin/AdminNav";
 
 const Admin = () => {
   return (
     <AdminLayout>
-      <MatchesManagement />
+      <AdminNav />
+      <Outlet />
     </AdminLayout>
   );
 };
