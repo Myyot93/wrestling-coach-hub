@@ -20,7 +20,7 @@ const AuditLog = () => {
         .from("audit_logs")
         .select(`
           *,
-          user:profiles(
+          profiles!audit_logs_user_id_fkey(
             id,
             full_name
           )
@@ -54,7 +54,7 @@ const AuditLog = () => {
           {auditLogs?.map((log) => (
             <TableRow key={log.id}>
               <TableCell>{format(new Date(log.created_at), 'MMM d, yyyy HH:mm:ss')}</TableCell>
-              <TableCell>{log.user?.full_name || 'System'}</TableCell>
+              <TableCell>{log.profiles?.full_name || 'System'}</TableCell>
               <TableCell>{log.action}</TableCell>
               <TableCell>{log.table_name}</TableCell>
               <TableCell>{log.record_id}</TableCell>
