@@ -8,7 +8,7 @@ import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: <Index />,
@@ -38,3 +38,5 @@ export const router = createBrowserRouter([
     element: <NotFound />,
   },
 ]);
+
+export default router;
