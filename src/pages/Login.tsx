@@ -30,22 +30,25 @@ const Login = () => {
       });
 
       if (error) {
+        console.error('Login error:', error);
         toast({
           variant: "destructive",
-          title: "Error",
+          title: "Login Error",
           description: error.message,
         });
         return;
       }
 
       if (data.user) {
+        console.log('Login successful:', data.user.id);
         toast({
           title: "Success",
           description: "You have successfully logged in.",
         });
-        navigate("/"); // Redirect to home page after successful login
+        navigate("/");
       }
     } catch (error) {
+      console.error('Unexpected login error:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -61,6 +64,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
+      // First, sign up the user
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -72,6 +76,7 @@ const Login = () => {
       });
 
       if (signUpError) {
+        console.error('Signup error:', signUpError);
         toast({
           variant: "destructive",
           title: "Error",
@@ -81,6 +86,7 @@ const Login = () => {
       }
 
       if (authData.user) {
+        console.log('Signup successful, creating profile for:', authData.user.id);
         // Create profile entry
         const { error: profileError } = await supabase
           .from('profiles')
@@ -88,6 +94,7 @@ const Login = () => {
             {
               id: authData.user.id,
               full_name: fullName,
+              role: 'user'  // Default role
             }
           ]);
 
@@ -108,6 +115,7 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
+      console.error('Unexpected signup error:', error);
       toast({
         variant: "destructive",
         title: "Error",
