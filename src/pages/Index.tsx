@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
+import { Loader } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +14,7 @@ const Index = () => {
   const { toast } = useToast();
 
   // Fetch profile data including team_id and role
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -36,7 +37,7 @@ const Index = () => {
   });
 
   // Fetch team's matches
-  const { data: matches } = useQuery({
+  const { data: matches, isLoading: isLoadingMatches } = useQuery({
     queryKey: ["matches", profile?.team_id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -64,7 +65,7 @@ const Index = () => {
   });
 
   // Fetch standings
-  const { data: standings } = useQuery({
+  const { data: standings, isLoading: isLoadingStandings } = useQuery({
     queryKey: ["standings"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -92,7 +93,7 @@ const Index = () => {
       <Navbar />
       
       <div className="container mx-auto pt-32 pb-20 px-4">
-        {/* Welcome Section */}
+        {/* Welcome Section with Loading State */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -100,7 +101,14 @@ const Index = () => {
           className="mb-12"
         >
           <h1 className="text-4xl font-bold text-wrestling-light mb-4">
-            Welcome, {profile?.full_name || 'Coach'}
+            {isLoadingProfile ? (
+              <div className="flex items-center gap-2">
+                <Loader className="w-8 h-8 animate-spin" />
+                <span>Loading...</span>
+              </div>
+            ) : (
+              `Welcome, ${profile?.full_name || 'Coach'}`
+            )}
           </h1>
           <p className="text-wrestling-muted">
             Manage your team's matches and view standings
@@ -115,11 +123,17 @@ const Index = () => {
           className="bg-white rounded-lg shadow-lg p-6 mb-8"
         >
           <h2 className="text-2xl font-semibold mb-4">Your Team's Matches</h2>
-          <MatchesTable 
-            matches={matches || []} 
-            userTeamId={profile?.team_id} 
-            userRole={profile?.role || 'user'}
-          />
+          {isLoadingMatches ? (
+            <div className="flex justify-center items-center p-8">
+              <Loader className="w-8 h-8 animate-spin" />
+            </div>
+          ) : (
+            <MatchesTable 
+              matches={matches || []} 
+              userTeamId={profile?.team_id} 
+              userRole={profile?.role || 'user'}
+            />
+          )}
         </motion.div>
 
         {/* League Standings */}
@@ -130,7 +144,13 @@ const Index = () => {
           className="bg-white rounded-lg shadow-lg p-6"
         >
           <h2 className="text-2xl font-semibold mb-4">League Standings</h2>
-          <StandingsTable standings={standings || []} />
+          {isLoadingStandings ? (
+            <div className="flex justify-center items-center p-8">
+              <Loader className="w-8 h-8 animate-spin" />
+            </div>
+          ) : (
+            <StandingsTable standings={standings || []} />
+          )}
         </motion.div>
       </div>
     </div>
