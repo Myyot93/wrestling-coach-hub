@@ -142,6 +142,33 @@ export type Database = {
           },
         ]
       }
+      password_resets: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          reset_token: string
+          used_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          reset_token: string
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          reset_token?: string
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           full_name: string | null
