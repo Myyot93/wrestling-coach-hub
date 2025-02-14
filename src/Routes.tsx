@@ -12,6 +12,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Index />,
+    errorElement: <NotFound />,
   },
   {
     path: "/login",
@@ -37,6 +38,8 @@ const router = createBrowserRouter([
     path: "*",
     element: <NotFound />,
   },
-]);
+], {
+  basename: import.meta.env.BASE_URL,
+});
 
 export default router;
